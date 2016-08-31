@@ -1,0 +1,15 @@
+AT+SAPBR =1,1 //open GPRS connection
+
+AT+SAPBR= 2,1 //queury GPRS connection
+
+AT+HTTPINIT //Initiate HTTP connection
+
+AT+HTTPPARA = “CID”,1 //no idea why we do this but we do
+
+AT+HTTPPARA= “URL”,”www.placeholder.com” //setURL to connect to
+
+AT+HTTPACTION=0 //tell module to GET
+
+AT+HTTPREAD //read the data of HTTP server
+
+AT+HTTPTERM //terminate http service

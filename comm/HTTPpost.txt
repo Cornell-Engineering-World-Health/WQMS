@@ -1,0 +1,19 @@
+AT+SAPBR =1,1 //open GPRS connection
+
+AT+SAPBR= 2,1 //queury GPRS connection
+
+AT+HTTPINIT //Initiate HTTP connection
+
+AT+HTTPPARA = “CID”,1 //no idea why we do this but we do
+
+AT+HTTPPARA= “URL”,”www.placeholder.com” //setURL to connect to
+
+AT+HTTPPARA="CONTENT","application/json" // Sets type of data to be sent to JSON format
+
+AT+HTTPDATA= X, Y //POST the data whose size is X Bytes and the maximum latency time for inputting is Y ms. It is recommended to set the latency time long enough to download all the data in the latency time.  
+
+//It is now downloading data from UART.
+
+AT+HTTPACTION=1 //start POST
+
+AT+HTTPTERM //terminate 
