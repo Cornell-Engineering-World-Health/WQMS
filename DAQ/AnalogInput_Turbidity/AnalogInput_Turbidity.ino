@@ -33,6 +33,7 @@ int ledPin = 8;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 void setup() {
+  Serial.begin(9600);
   // declare the ledPin as an OUTPUT:
   pinMode(ledPin, OUTPUT);
   pinMode(sensorPin, INPUT);
@@ -45,5 +46,5 @@ void loop() {
   sensorValue = analogRead(sensorPin);
   Serial.println(sensorValue);
   // delay should synchronize with those of other probes
-  delay(500);
+  delay(100);
 }
