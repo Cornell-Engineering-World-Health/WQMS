@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>                           //we have to include the SoftwareSerial library, or else we can't use it
-#include <TimerOne.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
@@ -60,17 +59,7 @@ ISR(WDT_vect)
     f_wdt= f_wdt+1;
   }
   else if(f_wdt == 10){
-    myserialGSM.begin(9600);
-    delay(100);
-    /*DO GSM STUFF HERE SINCE IT's an INTERRUPT
-     * 
-     * 
-     * 
-     */
-     myserialGSM.end();
-     f_wdt = f_wdt+1;
-     myserialEC.begin(9600);
-     delay(100);
+    
 
   }
   else
@@ -173,6 +162,82 @@ void loop() {
      //Serial.println(ph_float);
      digitalWrite(valvePin,HIGH);
       
+  }
+  else if(f_wdt == 10){
+    myserialEC.end();
+    wdt_disable();
+    /*DO GSM Here
+     * 
+     * 
+     */
+     myserialGSM.begin(9600);
+    delayMicroseconds(1638300);
+    /*DO GSM STUFF HERE SINCE IT's an INTERRUPT
+     * 
+     * 
+     * 
+     */
+     myserialGSM.println("\r\r\r");
+     delay(500);
+     char* cops = "AT+COPS?\r";
+     myserialGSM.println(cops);
+     delay(3000);
+     char* csq = "AT+CSQ\r";
+     myserialGSM.println(csq);
+     delay(3000);
+
+     /*setting SAPBR parameters*/
+     char* contype =("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
+     myserialGSM.println(contype);
+     //myserialGSM.print('\r');
+     delay(3000);
+     myserialGSM.println("AT+SAPBR=2,1\r");
+     myserialGSM.print('\r');
+     delay(3000);
+     myserialGSM.println("AT+SAPBR=1,1\r");
+     myserialGSM.print('\r');
+     delay(3000);
+     myserialGSM.println("AT+HTTPINIT\r");
+     myserialGSM.print('\r');
+     delay(3000);
+     /*setting HTTP parameters*/
+     myserialGSM.println("AT+HTTPPARA=\"CID\",1\r");
+     delay(3000);
+     myserialGSM.println("AT+HTTPPARA=\"URL\",\"http://ec2-54-86-133-189.compute-1.amazonaws.com:8080/load/WaterQuality\"\r");
+     delay(3000);
+     myserialGSM.println("AT+HTTPPARA=\"CONTENT\",\"int;boundary=----WebKitFormBoundaryvZ0ZHShNAcBABWFy\"\r");
+     delay(3000);
+     myserialGSM.println("AT+HTTPDATA=1000,10000\r");
+     delay(100);
+     
+     String boundary = "----WebKitFormBoundaryvZ0ZHShNAcBABWFy"; 
+     String JSON = boundary + " [{\"pH\": " + ph_float +",\"conductivity\": " + f_ec +"}] " + boundary +"\r";
+     myserialGSM.println(JSON);
+     delay(10000);
+     myserialGSM.println("AT+HTTPACTION=1\r");
+     delay(3000);
+     myserialGSM.println("AT+HTTPTERM\r");
+     delay(3000);
+     myserialGSM.end();
+     f_wdt = f_wdt+1;
+     myserialEC.begin(9600);
+     delay(100);
+     //WDTCSR |= _BV(WDIE);
+ /*** Setup the WDT ***/
+  
+  /* Clear the reset flag. */
+  MCUSR &= ~(1<<WDRF);
+  
+  /* In order to change WDE or the prescaler, we need to
+   * set WDCE (This will allow updates for 4 clock cycles).
+   */
+  WDTCSR |= (1<<WDCE) | (1<<WDE);
+
+  /* set new watchdog timeout prescaler value */
+  WDTCSR = 1<<WDP0 | 1<<WDP3; /* 8.0 seconds */
+  
+  /* Enable the WD interrupt (note no reset). */
+  WDTCSR |= _BV(WDIE);
   }
   else{
     enterSleep();
@@ -319,5 +384,4 @@ void getPHData(void){
     digitalWrite( 13, digitalRead( 13 ) ^ 1 );
 }
 */
-
 
