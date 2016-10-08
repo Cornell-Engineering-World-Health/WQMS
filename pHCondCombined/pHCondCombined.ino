@@ -9,11 +9,11 @@
 
 #define rx 2                                          //define what pin rx is going to be
 #define tx 3                                          //define what pin tx is going to be
-#define LED_PIN 13
+#define LED_PIN 13 //unused
 #define rx_GSM 4
 #define tx_GSM 5
 #define valvePin 6
-#define ledPin 7
+#define ledPin 8 
 
 SoftwareSerial myserialEC(rx, tx);                      //define how the soft serial port is going to work
 SoftwareSerial myserialGSM(rx_GSM,tx_GSM);
@@ -109,7 +109,7 @@ void setup() {
   Serial.println("Initialising...");
   delay(100); //Allow for serial print to complete.
 
-  pinMode(LED_PIN,OUTPUT);
+  pinMode(ledPin,OUTPUT);
   pinMode(valvePin,OUTPUT);
 
   /*** Setup the WDT ***/
@@ -144,8 +144,8 @@ void loop() {
     getPHData();
 
     //LED Control Code
-    if (ph_float > 8 || ph_float < 6) ledState = 1;   //MODIFY THIS CHECK BASED ON BIO TEAM DESCRIPTION!
-    else if (f_ec > 100) ledState = 1; //MODIFY!!
+    if (ph_float > 8.5 || ph_float < 6.5) ledState = 1;   //MODIFY THIS CHECK BASED ON BIO TEAM DESCRIPTION!
+    else if (f_ec > 2500) ledState = 1; //MODIFY!!
     else ledState = 0;
     digitalWrite(ledPin, ledState);
   }
@@ -177,6 +177,7 @@ void loop() {
      * 
      * 
      */
+     Serial.println("SENDING GSM COMMANDS");
      myserialGSM.println("\r\r\r");
      delay(500);
      char* cops = "AT+COPS?\r";
