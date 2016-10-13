@@ -54,7 +54,7 @@ int ledState = 0;
  ***************************************************/
 ISR(WDT_vect)
 {
-  if(f_wdt < 10)
+  if(f_wdt < 2700)
   {
     f_wdt= f_wdt+1;
   }
@@ -139,7 +139,7 @@ void serialEvent() {                                  //if the hardware serial p
 
 
 void loop() {
-  if(f_wdt>3 && f_wdt<6){ 
+  if(f_wdt>900 && f_wdt<1350){ 
     conductivityCode();
     getPHData();
 
@@ -149,7 +149,7 @@ void loop() {
     else ledState = 0;
     digitalWrite(ledPin, ledState);
   }
-  else if(f_wdt>=6 && f_wdt<10){
+  else if(f_wdt>=1350 && f_wdt<1800){
     myserialEC.end();
     /*Do GSM code here
      * 
@@ -163,7 +163,7 @@ void loop() {
      digitalWrite(valvePin,HIGH);
       
   }
-  else if(f_wdt == 10){
+  else if(f_wdt == 1800){
     myserialEC.end();
     wdt_disable();
     /*DO GSM Here
